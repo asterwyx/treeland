@@ -13,6 +13,7 @@ import TreeLand.Protocols.ForeignToplevelManager
 import TreeLand.Protocols.PersonalizationManager
 import TreeLand.Protocols.OutputManagement
 import TreeLand.Protocols.ShortcutManager
+import TreeLand.Protocols.Capture
 
 Item {
     id :root
@@ -263,6 +264,11 @@ Item {
         }
 
         ScreenCopyManager { }
+
+        CaptureManager {
+            id: captureManager
+            outputRenderWindow: renderWindow
+        }
     }
 
     InputMethodHelper {
@@ -302,6 +308,15 @@ Item {
             anchors.fill: parent
             focus: false
         }
+
+        Component {
+            id: captureSourceSelector
+            CaptureSourceSelector {
+                anchors.fill: parent
+                manager: captureManager
+            }
+        }
+
 
         onActiveFocusItemChanged: {
             // in case unexpected behavior happens
@@ -413,6 +428,13 @@ Item {
                     anchors.fill: outputCoordMapper
                 }
             }
+        }
+
+        Loader {
+            id: captureLayerLoader
+            anchors.fill: parent
+            active: captureManager.contextInSelection
+            sourceComponent: captureSourceSelector
         }
 
         Connections {

@@ -30,6 +30,8 @@ qt_add_qml_module(treeland-qml
         EQHGrid.qml
         ToplevelContainer.qml
         NewAnimation.qml
+        CaptureSourceSelector.qml
+        CaptureHelper.qml
     RESOURCE_PREFIX
         /qt/qml
     OUTPUT_DIRECTORY
