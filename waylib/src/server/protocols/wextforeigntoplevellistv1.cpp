@@ -52,7 +52,7 @@ public:
         surface->safeConnect(&WToplevelSurface::appIdChanged, handle, [this, handle, surface] {
             updateState(surface, handle);
         });
-        
+
         surfaces.insert({ surface, std::unique_ptr<qw_ext_foreign_toplevel_handle_v1>(handle) });
     }
 

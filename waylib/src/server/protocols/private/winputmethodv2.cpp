@@ -35,7 +35,7 @@ public:
 
 WInputMethodManagerV2::WInputMethodManagerV2([[maybe_unused]] QObject *parent)
     : WObject(*new WInputMethodManagerV2Private(this), nullptr)
-{ 
+{
 }
 
 QByteArrayView WInputMethodManagerV2::interfaceName() const

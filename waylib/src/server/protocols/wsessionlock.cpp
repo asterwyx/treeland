@@ -28,7 +28,7 @@ public:
     void onNewSurface(qw_session_lock_surface_v1 *surface);
     void onSurfaceDestroy(qw_session_lock_surface_v1 *surface);
     // end slot function
-    
+
     void init();
     void lock();
     void finish();
@@ -56,7 +56,7 @@ void WSessionLockPrivate::onNewSurface(qw_session_lock_surface_v1 *surface)
     WSessionLockSurface *lockSurface = new WSessionLockSurface(surface, q);
     lockSurface->setParent(q);
     Q_ASSERT(lockSurface->parent() == q);
-    
+
     lockSurface->safeConnect(&qw_session_lock_surface_v1::before_destroy, q, [this, surface] {
         onSurfaceDestroy(surface);
     });
@@ -69,7 +69,7 @@ void WSessionLockPrivate::onSurfaceDestroy(qw_session_lock_surface_v1 *surface)
 {
     W_Q(WSessionLock);
     WSessionLockSurface *lockSurface = WSessionLockSurface::fromHandle(surface);
-    
+
     bool ok = surfaceList.removeOne(lockSurface);
     if (!ok) {
         // surface may be removed by session lock

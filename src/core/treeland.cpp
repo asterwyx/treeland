@@ -5,7 +5,6 @@
 
 #include "treelandconfig.hpp"
 #include "core/qmlengine.h"
-#include "greeter/usermodel.h"
 #include "interfaces/multitaskviewinterface.h"
 #include "interfaces/plugininterface.h"
 #include "seat/helper.h"
@@ -25,7 +24,7 @@
 #  include <SignalHandler.h>
 #  include <SocketWriter.h>
 using namespace DDM;
-
+#  include "greeter/usermodel.h"
 #  include <DAccountsManager>
 #  include <DAccountsUser>
 #endif
@@ -305,7 +304,7 @@ public Q_SLOTS: // METHODS
     {
         parent()->XWaylandName();
     }
-    
+
 Q_SIGNALS: // SIGNALS
     void SessionChanged();
 };
@@ -436,6 +435,7 @@ bool Treeland::ActivateWayland(QDBusUnixFileDescriptor _fd)
 
     socket->create(fd->fileDescriptor(), false);
 
+#ifndef DISABLE_DDM
     auto userModel =
         d->helper->qmlEngine()->singletonInstance<UserModel *>("Treeland", "UserModel");
     if (auto u = userModel->getUser(user)) {
@@ -455,6 +455,7 @@ bool Treeland::ActivateWayland(QDBusUnixFileDescriptor _fd)
                 userModel->getUser(user)->setWaylandSocket(nullptr);
                 d->userDisplayFds.remove(user);
             });
+#endif
 
     return true;
 }

@@ -426,7 +426,7 @@ Qt::MouseButton WCursor::fromNativeButton(uint32_t code)
     case 0x11d: qt_button = Qt::ExtraButton11; break;
     case 0x11e: qt_button = Qt::ExtraButton12; break;
     case 0x11f: qt_button = Qt::ExtraButton13; break;
-    default: 
+    default:
         qCWarning(waylibCursorInput) << "Invalid button code:" << QString("0x%1").arg(code, 0, 16)
                                     << "- not mappable to Qt button";
     }
@@ -454,7 +454,7 @@ uint32_t WCursor::toNativeButton(Qt::MouseButton button)
     case Qt::ExtraButton12: return 0x11e;
     case Qt::ExtraButton13: return 0x11f;
     default:
-        qCWarning(waylibCursorInput) << "Invalid Qt button:" << button 
+        qCWarning(waylibCursorInput) << "Invalid Qt button:" << button
                                     << "- cannot be mapped to native button code";
     }
 
@@ -604,7 +604,7 @@ bool WCursor::attachInputDevice(WInputDevice *device)
 
     W_D(WCursor);
     Q_ASSERT(!d->deviceList.contains(device));
-    qCDebug(waylibCursor) << "Attaching input device" << device->qtDevice()->name() 
+    qCDebug(waylibCursor) << "Attaching input device" << device->qtDevice()->name()
                          << "of type" << static_cast<int>(device->type()) << "to cursor";
     d->handle()->attach_input_device(device->handle()->handle());
     d->deviceList << device;
@@ -627,7 +627,7 @@ void WCursor::detachInputDevice(WInputDevice *device)
         return;
     }
 
-    qCDebug(waylibCursor) << "Detaching input device" << device->qtDevice()->name() 
+    qCDebug(waylibCursor) << "Detaching input device" << device->qtDevice()->name()
                          << "from cursor";
     d->handle()->detach_input_device(device->handle()->handle());
     d->handle()->map_input_to_output(device->handle()->handle(), nullptr);

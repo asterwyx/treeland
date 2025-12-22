@@ -27,9 +27,11 @@ static void switchToUser([[maybe_unused]] struct wl_client *client, [[maybe_unus
     auto helper = Helper::instance();
     if (user == "ddm") {
         helper->showLockScreen(false);
+#ifndef DISABLE_DDM
     } else if (user != helper->userModel()->currentUserName()) {
         helper->userModel()->setCurrentUserName(QString(username));
         helper->showLockScreen(false);
+#endif
     }
 }
 

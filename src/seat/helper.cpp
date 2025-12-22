@@ -10,7 +10,6 @@
 #include "modules/dde-shell/ddeshellmanagerinterfacev1.h"
 #include "input/inputdevice.h"
 #include "core/layersurfacecontainer.h"
-#include "greeter/usermodel.h"
 #ifdef EXT_SESSION_LOCK_V1
 #include "wsessionlock.h"
 #include "wsessionlockmanager.h"
@@ -40,7 +39,10 @@
 #include "treelandconfig.hpp"
 #include "treelanduserconfig.hpp"
 #include "core/treeland.h"
+#if !defined(DISABLE_DDM)
 #include "greeter/greeterproxy.h"
+#include "greeter/usermodel.h"
+#endif
 #include "modules/screensaver/screensaverinterfacev1.h"
 #include "xsettings/settingmanager.h"
 #include "modules/shortcut/shortcutmanager.h"
@@ -1216,7 +1218,9 @@ void Helper::init(Treeland::Treeland *treeland)
 {
     m_treeland = treeland;
     auto engine = qmlEngine();
+#ifndef DISABLE_DDM
     m_userModel = engine->singletonInstance<UserModel *>("Treeland", "UserModel");
+#endif
 
     engine->setContextForObject(m_renderWindow, engine->rootContext());
     engine->setContextForObject(m_renderWindow->contentItem(), engine->rootContext());
@@ -1320,6 +1324,7 @@ void Helper::init(Treeland::Treeland *treeland)
         });
     m_personalization = m_server->attach<PersonalizationV1>();
 
+#ifndef DISABLE_DDM
     auto updateCurrentUser = [this] {
         m_config.reset(TreelandUserConfig::createByName("org.deepin.dde.treeland.user",
                                                   "org.deepin.dde.treeland",
@@ -1330,6 +1335,7 @@ void Helper::init(Treeland::Treeland *treeland)
     connect(m_userModel, &UserModel::currentUserNameChanged, this, updateCurrentUser);
 
     updateCurrentUser();
+#endif
 
     connect(m_personalization,
             &PersonalizationV1::backgroundChanged,
@@ -1432,7 +1438,9 @@ void Helper::init(Treeland::Treeland *treeland)
     xwaylandOutputManager->setFilter([this](WClient *client) { return isXWaylandClient(client); });
     // User dde does not has a real Logind session, so just pass 0 as id
     updateActiveUserSession(QStringLiteral("dde"), 0);
+#ifndef DISABLE_DDM
     connect(m_userModel, &UserModel::userLoggedIn, this, &Helper::updateActiveUserSession);
+#endif
     m_xdgDecorationManager = m_server->attach<WXdgDecorationManager>();
     connect(m_xdgDecorationManager,
             &WXdgDecorationManager::surfaceModeChanged,
@@ -2040,7 +2048,7 @@ void Helper::onExtSessionLock(WSessionLock *lock)
     }
 
     deleteTaskSwitch();
-        
+
     setWorkspaceVisible(false);
 
     lock->safeConnect(&WSessionLock::abandoned, this, [this]() {
@@ -2149,9 +2157,9 @@ Helper::OutputMode Helper::outputMode() const
 }
 
 /**
- * Add a WSocket to the Wayland server. 
+ * Add a WSocket to the Wayland server.
  * This function is used by Treeland::ActivateWayland.
- * 
+ *
  * @param socket WSocket to add
  */
 void Helper::addSocket(WSocket *socket)
@@ -2161,7 +2169,7 @@ void Helper::addSocket(WSocket *socket)
 
 /**
  * Find the session for the given uid
- * 
+ *
  * @param uid User ID to find session for
  * @returns Session for the given uid, or nullptr if not found
  */
@@ -2176,7 +2184,7 @@ std::shared_ptr<Session> Helper::sessionForUid(uid_t uid) const
 
 /**
  * Find the session for the given WXWayland
- * 
+ *
  * @param xwayland WXWayland to find session for
  * @returns Session for the given xwayland, or nullptr if not found
  */
@@ -2191,7 +2199,7 @@ std::shared_ptr<Session> Helper::sessionForXWayland(WXWayland *xwayland) const
 
 /**
  * Find the session for the given WSocket
- * 
+ *
  * @param socket WSocket to find session for
  * @returns Session for the given socket, or nullptr if not found
  */
@@ -2242,7 +2250,7 @@ void Helper::removeSession(std::shared_ptr<Session> session)
 
 /**
  * Ensure a session exists for the given uid, creating it if necessary
- * 
+ *
  * @param id An existing logind session ID
  * @param uid User ID to ensure session for
  * @returns Session for the given uid, or nullptr on failure
@@ -2359,7 +2367,7 @@ std::shared_ptr<Session> Helper::ensureSession(int id, uid_t uid)
 
 /**
  * Get the WXWayland for the given uid
- * 
+ *
  * @param uid User ID to get WXWayland for
  * @returns WXWayland for the given uid, or nullptr if not found/created
  */
@@ -2371,7 +2379,7 @@ WXWayland *Helper::xwaylandForUid(uid_t uid)
 
 /**
  * Get the WSocket for the given uid
- * 
+ *
  * @param uid User ID to get WSocket for
  * @returns WSocket for the given uid, or nullptr if not found/created
  */
@@ -2381,9 +2389,9 @@ WSocket *Helper::waylandSocketForUid(uid_t uid)
     return session ? session->socket : nullptr;
 }
 
-/** 
+/**
  * Get the WSocket for the active session
- * 
+ *
  * @returns WSocket for the active session, or nullptr if none active
  */
 WSocket *Helper::defaultWaylandSocket() const
@@ -2396,7 +2404,7 @@ WSocket *Helper::defaultWaylandSocket() const
 
 /**
  * Get the WXWayland for the active session
- * 
+ *
  * @returns WXWayland for the active session, or nullptr if none active
  */
 WXWayland *Helper::defaultXWaylandSocket() const
@@ -2411,7 +2419,7 @@ WXWayland *Helper::defaultXWaylandSocket() const
  * Update the active session to the given uid, creating it if necessary.
  * This will update XWayland visibility and emit socketFileChanged if the
  * active session changed.
- * 
+ *
  * @param username Username to set as active session
  */
 void Helper::updateActiveUserSession(const QString &username, int id)
@@ -2444,7 +2452,7 @@ void Helper::updateActiveUserSession(const QString &username, int id)
 /**
  * Check if the given WClient belongs to any XWayland session.
  * This is used in setFilter function for output managers.
- * 
+ *
  * @param client WClient to check
  * @returns true if the client is an XWayland client, false otherwise
  */
@@ -2750,6 +2758,7 @@ void Helper::onPrepareForSleep(bool sleep)
     }
 }
 
+#ifndef DISABLE_DDM
 UserModel *Helper::userModel() const {
     return m_userModel;
 }
@@ -2757,6 +2766,7 @@ UserModel *Helper::userModel() const {
 DDMInterfaceV1 *Helper::ddmInterfaceV1() const {
     return m_ddmInterfaceV1;
 }
+#endif
 
 void Helper::activateSession() {
     if (!m_backend->isSessionActive())

@@ -211,7 +211,7 @@ void WXWaylandSurfacePrivate::updateWindowTypes()
 
     for (size_t i = 0; i < nativeHandle()->window_type_len; ++i) {
         auto atomType = xwayland->atomType(nativeHandle()->window_type[i]);
-        
+
         switch (atomType) {
         case WXWayland::_NET_WM_WINDOW_TYPE_NORMAL:
             types |= WXWaylandSurface::NET_WM_WINDOW_TYPE_NORMAL;
